@@ -1,0 +1,14 @@
+{
+  "name": "Eurosport Report Parser",
+  "version": "0.0.1",
+  "ignore": [
+    ".jshintrc",
+    "**/*.txt"
+  ],
+  "dependencies": {
+    "angular" : "*",
+    "angular-ui" : "*",
+    "jquery" : "*",
+    "bootstrap" : "*"
+  }
+}
