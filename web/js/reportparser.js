@@ -211,9 +211,11 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
 
     function computeCancelled (programmeObject) {
         programmeObject.cancelled = programmeObject.id.length < 1 ? true : false;
-        programmeObject.cancelled = _.isNumber(programmeObject.id) ? false : true;
-        if (programmeObject.cancelled)
+        programmeObject.cancelled = isNaN(parseInt(programmeObject.id)) ? true : false;
+        if (programmeObject.cancelled){
+            programmeObject.id = "Elmaradt";
             logMessage("A " + programmeObject.programme + " elmaradt.", 1);
+        }
     }
 
     function logMessage (message, level) {
