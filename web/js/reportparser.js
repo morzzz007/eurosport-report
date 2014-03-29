@@ -58,7 +58,7 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
         lines.forEach(function(line) {
             if (fatalError) return;
             current++;
-            var lineDatas = line.split(";");
+            var lineDatas = line.split("\t");
             if (lineDatas.length > 10){
                 var tempProgramme = {
                     commentatorName : lineDatas[0],
@@ -225,7 +225,7 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
         {
 
             // check extension
-            if(file[0].type === 'text/csv'){
+            if(file[0].name.indexOf(".txt") > 0){
                 reader.readAsText(file[0]);
 
                 reader.onload = function() {
