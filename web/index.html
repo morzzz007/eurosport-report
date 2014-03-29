@@ -75,7 +75,7 @@
               </div>
               <div class="box-body">
                 <ul class="logul">
-                  <li class="logli" ng-repeat="logItem in logData" ng-bind="logItem.message"></li>
+                  <li class="logli" ng-repeat="logItem in logData" ng-bind="logItem.message" ng-class="{'text-red' : logItem.level == 2}"></li>
                 </ul>
               </div>
           </div>

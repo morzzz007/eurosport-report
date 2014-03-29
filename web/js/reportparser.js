@@ -40,17 +40,26 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
     };
 
     function csvToJSON (csvText) {
+        $scope.logData = [];
+
         var resultObject = [];
 
         var lines = csvText.split(/[\r\n]+/g);      // tolerate both Windows and Unix linebreaks
 
         var max = lines.length;
-        var current = 0;
 
+        if( max <= 1 ) {
+            logMessage("A fájl valószínűleg hibás, mert túl kevés sorból áll.", 2);
+            return;
+        }
+
+        var current = 0;
+        var fatalError = false;
         lines.forEach(function(line) {
+            if (fatalError) return;
             current++;
             var lineDatas = line.split(";");
-            if (lineDatas.length > 1){
+            if (lineDatas.length > 10){
                 var tempProgramme = {
                     commentatorName : lineDatas[0],
                     date : lineDatas[1],
@@ -83,6 +92,9 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
                 } else {
                     logMessage("A " + tempProgramme.id + " számú műsor kétszer szerepelt azonos időpontban.", 1);
                 }
+            } else {
+                logMessage("A fájl nem tartalmaz elég adatot.", 2);
+                fatalError = true;
             }
             setPercentage(current, max);
         });
@@ -207,13 +219,24 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
 
     $scope.fileSelected = function (file) {
 
-        reader.readAsText(file[0]);
+        if(file.length == 1)
+        {
 
-        reader.onload = function() {
-            $scope.textResult = reader.result;
-            $scope.jsonData = csvToJSON(reader.result);
-            $scope.$digest();
-        };
+            // check extension
+            if(file[0].type === 'text/csv'){
+                reader.readAsText(file[0]);
+
+                reader.onload = function() {
+                    $scope.textResult = reader.result;
+                    $scope.jsonData = csvToJSON(reader.result);
+                    $scope.$digest();
+                };
+            } else {
+                logMessage("Nem megfelelő formátum.", 2);
+                $scope.$digest();
+            }
+
+        }
 
     };
 }]);
