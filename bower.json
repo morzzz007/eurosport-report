@@ -10,6 +10,8 @@
     "angular-ui" : "*",
     "jquery" : "*",
     "bootstrap" : "*",
-    "underscore" : "*"
+    "underscore" : "*",
+    "momentjs" : "*",
+    "fullcalendar" : "*"
   }
 }

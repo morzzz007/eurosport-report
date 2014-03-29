@@ -1,5 +1,5 @@
 table {
-    font-size: 14px;
+    font-size: 13px;
 }
 
 table .danger {
@@ -9,4 +9,20 @@ table .danger {
 .logul {
     font-size: 12px;
     padding-left: 25px;
+}
+
+.table-condensed>tbody>tr>td {
+    vertical-align: middle;
+}
+
+.fc-event-vert {
+    border-width: 1px 1px;
+    color: black;
+    font-weight: 900;
+    font-size: 1.1em;
+}
+
+.fc-event-vert .fc-event-time {
+    white-space: nowrap;
+    font-size: 14px;
 }

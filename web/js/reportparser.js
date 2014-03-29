@@ -1,4 +1,5 @@
-/*global angular, console, _ */
+/*global angular, console, _, moment, $ */
+
 
 var eurosportApp = angular.module('eurosportApp',[]);
 
@@ -6,17 +7,35 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
 
     'use strict';
 
+    String.prototype.reverse=function(){return this.split("").reverse().join("");};
+
     var reader = new FileReader();
+
+    var eus1EventColor = '#428bca';
+    var eus2EventColor = '#d9534f';
+    var eus2NEEventColor = '#5bc0de';
+    var eus1Name = 'INTER';
+    var eus2Name = 'EUROSPORT 2';
+    var eus2NEName = 'EUROSPORT 2 NORTH-EAST';
 
     $scope.selectedFile;
     $scope.textResult;
     $scope.jsonData;
-
+    $scope.calendarEvents = [];
     $scope.parseComplete = false;
     $scope.logData = [];
+    $scope.printView = false;
 
     $scope.progressStyle = {
         width : $scope.progressPercentage +'%'
+    };
+
+    $scope.togglePrintView = function () {
+        $scope.printView = !$scope.printView;
+    }
+
+    $scope.displayDate = function (date) {
+       return moment(date).format("YYYY/MM/DD HH:mm");
     };
 
     function csvToJSON (csvText) {
@@ -45,8 +64,11 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
                     realEndTime : lineDatas[10]
                 };
                 
-                computeRealTime(tempProgramme);
                 computeCancelled(tempProgramme);
+                computeRealTime(tempProgramme);
+                computeBaseDate(tempProgramme);
+                computeCalendarDates(tempProgramme);
+
 
                 // look for identical object before pushing
                 var possibleIdentical = _.find(resultObject, function(prog){
@@ -65,11 +87,103 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
         });
 
         $scope.parseComplete = true;
+        makeFullCalendarEvents(resultObject);
+        $scope.$broadcast('initCalendar');
         return resultObject;
+    }
+
+    $scope.returnEventColor = function (programme) {
+        if (programme.channel == eus1Name) {
+            return eus1EventColor;
+        }
+        if (programme.channel == eus2Name) {
+            return eus2EventColor;
+        }
+        if (programme.channel == eus2NEName) {
+            return eus2NEEventColor;
+        }
+    };
+
+    $scope.returnResourceId = function (programme) {
+        if (programme.channel == eus1Name) {
+            return 1;
+        }
+        if (programme.channel == eus2Name) {
+            return 2;
+        }
+        if (programme.channel == eus2NEName) {
+            return 3;
+        }
+    };
+
+    function makeFullCalendarEvents(array) {
+        var fullCalendarEvents = [];
+        array.forEach(function (programme) {
+            if(!programme.cancelled)
+                fullCalendarEvents.push( {
+                    title  : programme.id,
+                    start  : moment(programme.calendarStartDate).format("YYYY-MM-DD HH:mm"),
+                    end    : moment(programme.calendarEndDate).format("YYYY-MM-DD HH:mm"),
+                    allDay : false,
+                    color  : $scope.returnEventColor(programme),
+                    resourceId: $scope.returnResourceId(programme)
+                });
+        });
+
+        $scope.calendarEvents = fullCalendarEvents;
+    }
+
+    function computeCalendarDates (programmeObject) {
+        var startTimeDatas = programmeObject.computedStartTime.split(":");
+        var m = moment(programmeObject.date);
+
+        if(startTimeDatas[0] >= 0 && startTimeDatas[0] < 3) {
+            logMessage("A " + programmeObject.id + " számú műsor másnap kezdődik (?)", 2);
+            m.add('days', 1);
+        } else if(startTimeDatas[0] >= 24) {
+            logMessage("A " + programmeObject.id + " számú műsor másnap kezdődik.", 1);
+            startTimeDatas[0] = startTimeDatas[0] - 24; // start date will be the next date
+            m.add('days', 1);
+        }
+
+        m.set('hour', startTimeDatas[0]);
+        m.set('minute', startTimeDatas[1]);
+
+        programmeObject.calendarStartDate = m.toDate();
+
+        var endTimeDatas = programmeObject.computedEndTime.split(":");
+        m = moment(programmeObject.date);
+
+        if(endTimeDatas[0] >= 0 && endTimeDatas[0] < 3) {
+            logMessage("A " + programmeObject.id + " számú műsor másnap végződik (?)", 2);
+            m.add('days', 1);
+        } else if (endTimeDatas[0] >= 24) {
+            logMessage("A " + programmeObject.id + " számú műsor másnap végződik.", 1);
+            endTimeDatas[0] = endTimeDatas[0] - 24; // end date will be the next date
+            m.add('days', 1);
+        }
+
+
+
+        m.set('hour', endTimeDatas[0]);
+        m.set('minute', endTimeDatas[1]);
+
+        programmeObject.calendarEndDate = m.toDate();
     }
 
     function setPercentage (current, max) {
         $scope.progressStyle.width = (current/max * 100) + '%';
+    }
+
+    function computeBaseDate (programmeObject) {
+        // a date looks like this: Sun 16/03/2014
+        var extractedDate = programmeObject.date.reverse().substring(0,10).reverse();
+        var day = extractedDate.substring(0,2);
+        var month = extractedDate.substring(3,5);
+        var year = extractedDate.substring(6,10);
+
+        programmeObject.date = new Date(year, month - 1, day);
+
     }
 
     function computeRealTime (programmeObject) {
@@ -102,3 +216,79 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
 
     };
 }]);
+
+eurosportApp.directive('fullCalendar', function(){
+
+    'use strict';
+
+    return {
+        scope: {
+            events : "="
+        },
+        restrict: 'EA',
+        link: function($scope, iElm) {
+
+            $('#calendar-prev-button').click(function() {
+                $('#calendar').fullCalendar('prev');
+                updateDate();
+            });
+            $('#calendar-next-button').click(function() {
+                $('#calendar').fullCalendar('next');
+                updateDate();
+            });
+
+            function updateDate () {
+                $('#calendar-date').text(moment($('#calendar').fullCalendar('getDate')).format("YYYY/MM/DD"));
+            }
+
+            $scope.$watch('events', function (newVal) {
+                if(newVal.length !== 0){
+                    $(iElm).fullCalendar({
+                        allDaySlot : false,
+                        header: false,
+                        theme: true,
+                        defaultView : "resourceDay",
+                        events: $scope.events,
+                        slotEventOverlap : false,resources: [
+                            { name: 'Eurosport Inter', id: 1 },
+                            { name: 'Eurosport 2', id: 2 },
+                            { name: 'Eurosport 2 NE', id: 3 },
+                        ],
+                        timeFormat: 'HH:mm',
+                        axisFormat: 'HH:mm',
+                        buttonText: {
+                            prev: 'előző nap',
+                            next: 'következő nap',
+                            today: 'mai nap',
+                        }
+                    });
+
+                    $(iElm).fullCalendar('gotoDate', newVal[0].start);
+                    updateDate();
+                }
+            });
+
+
+        }
+    };
+});
+
+eurosportApp.directive('uploadButton', function(){
+
+    'use strict';
+
+    return {
+        restrict: 'A',
+        link: function($scope, $element) {
+            var fileElem = document.getElementById("fileElem");
+
+            $element.bind('click', function (e) {
+                if (fileElem) {
+                    fileElem.click();
+                }
+                e.preventDefault();
+            });
+
+        }
+    };
+});

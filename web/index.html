@@ -8,14 +8,17 @@
 
     <title>Eurosport Report Parser</title>
 
-    <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="../bower_components/jquery/jquery.min.js"></script>
     <script src="../bower_components/angular/angular.min.js"></script>
     <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="../bower_components/underscore/underscore.js"></script>
+    <script src="../bower_components/momentjs/moment.js"></script>
+    <script src="js/fullcalendar.min.js"></script>
     <script src="js/reportparser.js"></script>
 
 
     <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../bower_components/fullcalendar/fullcalendar.css" rel="stylesheet">
     <link href="css/adminlte.css" rel="stylesheet">
     <link href="css/eusp.css" rel="stylesheet">
 
@@ -23,7 +26,7 @@
 
   <body ng-controller="reportController">
 
-    <div class="container">
+    <div class="container" ng-if="!printView">
       <div class="row">
         <div class="col-md-12">
           <h1>Eurosport Report Parser</h1>
@@ -31,7 +34,7 @@
       </div>
     </div>
 
-    <div class="container">
+    <div class="container" ng-if="!printView">
       <div class="row">
 
         <div class="col-md-4">
@@ -40,7 +43,8 @@
                   <h3 class="box-title">CSV fájl feltöltése</h3>
               </div>
               <div class="box-body">
-                <input type="file" id="input" onchange="angular.element(this).scope().fileSelected(this.files)">
+                <input type="file" id="fileElem" onchange="angular.element(this).scope().fileSelected(this.files)" style="display: none">
+                <a href="#" class="btn btn-danger btn-block" upload-button>Feltöltés</a> 
               </div>
               <div class="box-footer">
                   <div class="progress progress-striped active" style="margin-bottom: 0px">
@@ -51,7 +55,7 @@
                   </div>
                   <div ng-if="parseComplete">
                     <br>
-                    <button class="btn btn-primary btn-block">Nyomtat</button>                    
+                    <button class="btn btn-primary btn-block" ng-click="togglePrintView()">Nyomtat</button>                    
                   </div>
               </div>
           </div>
@@ -72,14 +76,15 @@
         <div class="col-md-8">
           <div class="box box-primary">
             <div class="box-body no-padding">
-              <table class="table table-condensed">
+              <table class="table table-condensed programmes">
                 <tbody>
                   <tr>
                       <th style="width: 10px">#</th>
                       <th>Id</th>
                       <th>Planned</th>
                       <th>Real</th>
-                      <th>Computed</th>
+                      <th>Computed start</th>
+                      <th>Computed end</th>
                   </tr>
                   <tr ng-repeat="programme in jsonData" ng-class="{danger : programme.cancelled}">
                       <td style="vertical-align:middle">
@@ -87,10 +92,15 @@
                         <img ng-if="programme.channel == 'EUROSPORT 2'" src="img/eus2.png">
                         <img ng-if="programme.channel == 'EUROSPORT 2 NORTH-EAST'" src="img/eus2.png">
                       </td>
-                      <td ng-bind="programme.id"></td>
+                      <td>
+                        <span ng-if="programme.channel == 'INTER'" ng-bind="programme.id" class="label label-primary"></span>
+                        <span ng-if="programme.channel == 'EUROSPORT 2'" ng-bind="programme.id" class="label label-danger"></span>
+                        <span ng-if="programme.channel == 'EUROSPORT 2 NORTH-EAST'" ng-bind="programme.id" class="label label-info"></span>
+                      </td>
                       <td ng-bind="programme.originalStartTime + '-' + programme.originalEndTime"></td>
                       <td ng-bind="programme.realStartTime + '-' + programme.realEndTime"></td>
-                      <td ng-bind="programme.computedStartTime + '-' + programme.computedEndTime"></td>
+                      <td ng-bind="displayDate(programme.calendarStartDate)"></td>
+                      <td ng-bind="displayDate(programme.calendarEndDate)"></td>
                       <td></td>
                   </tr>
               </tbody>
@@ -102,6 +112,25 @@
       </div>
 
     </div> 
+
+    <div class="container" ng-if="calendarEvents.length > 0">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="box box-primary">
+          <div class="box-header">
+              <h3 class="box-title" id="calendar-date"></h3>
+              <div class="box-tools pull-right">
+                  <button class="btn btn-default btn-sm" id="calendar-prev-button">Előző nap</button>
+                  <button class="btn btn-default btn-sm" id="calendar-next-button">Következő nap</button>
+              </div>
+          </div>
+            <div class="box-body no-padding">
+              <div id="calendar" full-calendar events="calendarEvents"></div>
+            </div>
+          </div> 
+        </div>
+      </div>
+    </div>
 
   </body>
 </html>
