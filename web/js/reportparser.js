@@ -93,8 +93,10 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
                     logMessage("A " + tempProgramme.id + " számú műsor kétszer szerepelt azonos időpontban.", 1);
                 }
             } else {
-                logMessage("A fájl nem tartalmaz elég adatot.", 2);
-                fatalError = true;
+                if (line !== "") {
+                    logMessage("A fájl nem tartalmaz elég adatot.", 2);
+                    fatalError = true;
+                }
             }
             setPercentage(current, max);
         });
@@ -227,12 +229,19 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
                 reader.readAsText(file[0]);
 
                 reader.onload = function() {
+                    $scope.calendarEvents = [];
+                    $scope.parseComplete = false;
+                    $scope.logData = [];
                     $scope.textResult = reader.result;
                     $scope.jsonData = csvToJSON(reader.result);
                     $scope.$digest();
                 };
             } else {
+                $scope.logData = [];
                 logMessage("Nem megfelelő formátum.", 2);
+                $scope.calendarEvents = [];
+                $scope.parseComplete = false;
+                $scope.jsonData = [];
                 $scope.$digest();
             }
 
