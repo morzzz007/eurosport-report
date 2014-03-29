@@ -33,11 +33,22 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
 
     $scope.togglePrintView = function () {
         $scope.printView = !$scope.printView;
-    }
+    };
 
     $scope.displayDate = function (date) {
        return moment(date).format("YYYY/MM/DD HH:mm");
     };
+
+    function calculateOverlaps (programme) {
+        programme.overlaps = [];
+        var overlapArray = [];
+        $scope.jsonData.forEach(function (prog) {
+            if( (prog.calendarStartDate <= programme.calendarEndDate) && (prog.calendarEndDate >= programme.calendarStartDate)) {
+                overlapArray.push(prog);
+            }
+        });
+        programme.overlaps = overlapArray;
+    }
 
     function csvToJSON (csvText) {
         $scope.logData = [];
