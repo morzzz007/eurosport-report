@@ -29,7 +29,7 @@
     <div class="container" ng-if="!printView">
       <div class="row">
         <div class="col-md-12">
-          <h1>Eurosport Report Parser</h1>
+          <h1 class="main-title">Eurosport Report Parser</h1>
         </div>
       </div>
     </div>
@@ -37,7 +37,7 @@
     <div class="container" ng-if="!printView">
       <div class="row">
 
-        <div class="col-md-4">
+        <div class="col-md-4" ng-class="{'col-md-offset-4': !jsonData.length}">
           <div class="box box-primary">
               <div class="box-header">
                   <h3 class="box-title">CSV fájl feltöltése</h3>
@@ -73,7 +73,7 @@
 
         </div>
         
-        <div class="col-md-8">
+        <div class="col-md-8" ng-if="jsonData.length > 0">
           <div class="box box-primary">
             <div class="box-body no-padding">
               <table class="table table-condensed programmes">

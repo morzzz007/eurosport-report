@@ -26,3 +26,10 @@ table .danger {
     white-space: nowrap;
     font-size: 14px;
 }
+
+.main-title {
+    font-family: 'Lato', sans-serif;
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px
+}
