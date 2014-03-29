@@ -278,6 +278,9 @@ eurosportApp.directive('fullCalendar', function(){
             }
 
             $scope.$watch('events', function (newVal) {
+
+                $(iElm).fullCalendar( 'destroy' );
+
                 if(newVal.length !== 0){
                     $(iElm).fullCalendar({
                         allDaySlot : false,
