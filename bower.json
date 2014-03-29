@@ -9,6 +9,7 @@
     "angular" : "*",
     "angular-ui" : "*",
     "jquery" : "*",
-    "bootstrap" : "*"
+    "bootstrap" : "*",
+    "underscore" : "*"
   }
 }

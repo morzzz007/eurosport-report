@@ -1,0 +1,12 @@
+table {
+    font-size: 14px;
+}
+
+table .danger {
+    text-decoration: line-through;
+}
+
+.logul {
+    font-size: 12px;
+    padding-left: 25px;
+}

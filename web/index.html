@@ -1,4 +1,4 @@
-<html lang="en">
+<html lang="en" ng-app="eurosportApp">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,15 +11,96 @@
     <script src="../bower_components/jquery/dist/jquery.min.js"></script>
     <script src="../bower_components/angular/angular.min.js"></script>
     <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="../bower_components/underscore/underscore.js"></script>
+    <script src="js/reportparser.js"></script>
 
-    <!-- Bootstrap core CSS -->
+
+    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/adminlte.css" rel="stylesheet">
+    <link href="css/eusp.css" rel="stylesheet">
+
   </head>
 
-  <body>
+  <body ng-controller="reportController">
 
     <div class="container">
-      <h1>Hello Bootstrap</h1>
+      <div class="row">
+        <div class="col-md-12">
+          <h1>Eurosport Report Parser</h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+
+        <div class="col-md-4">
+          <div class="box box-primary">
+              <div class="box-header">
+                  <h3 class="box-title">CSV fájl feltöltése</h3>
+              </div>
+              <div class="box-body">
+                <input type="file" id="input" onchange="angular.element(this).scope().fileSelected(this.files)">
+              </div>
+              <div class="box-footer">
+                  <div class="progress progress-striped active" style="margin-bottom: 0px">
+                      <div  class="progress-bar progress-bar-primary active" 
+                            role="progressbar" 
+                            ng-style="progressStyle">
+                      </div>
+                  </div>
+                  <div ng-if="parseComplete">
+                    <br>
+                    <button class="btn btn-primary btn-block">Nyomtat</button>                    
+                  </div>
+              </div>
+          </div>
+
+          <div class="box box-primary" ng-if="logData.length">
+              <div class="box-header">
+                  <h3 class="box-title">Log</h3>
+              </div>
+              <div class="box-body">
+                <ul class="logul">
+                  <li class="logli" ng-repeat="logItem in logData" ng-bind="logItem.message"></li>
+                </ul>
+              </div>
+          </div>
+
+        </div>
+        
+        <div class="col-md-8">
+          <div class="box box-primary">
+            <div class="box-body no-padding">
+              <table class="table table-condensed">
+                <tbody>
+                  <tr>
+                      <th style="width: 10px">#</th>
+                      <th>Id</th>
+                      <th>Planned</th>
+                      <th>Real</th>
+                      <th>Computed</th>
+                  </tr>
+                  <tr ng-repeat="programme in jsonData" ng-class="{danger : programme.cancelled}">
+                      <td style="vertical-align:middle">
+                        <img ng-if="programme.channel == 'INTER'" src="img/eus1.png">
+                        <img ng-if="programme.channel == 'EUROSPORT 2'" src="img/eus2.png">
+                        <img ng-if="programme.channel == 'EUROSPORT 2 NORTH-EAST'" src="img/eus2.png">
+                      </td>
+                      <td ng-bind="programme.id"></td>
+                      <td ng-bind="programme.originalStartTime + '-' + programme.originalEndTime"></td>
+                      <td ng-bind="programme.realStartTime + '-' + programme.realEndTime"></td>
+                      <td ng-bind="programme.computedStartTime + '-' + programme.computedEndTime"></td>
+                      <td></td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        </div>
+
+      </div>
+
     </div> 
 
   </body>
