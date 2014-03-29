@@ -26,11 +26,51 @@
 
   <body ng-controller="reportController">
 
+    <div class="modal fade" id="howToModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Hogyan működik?</h4>
+          </div>
+          <div class="modal-body">
+          
+            <p>A napi jelentésből tetszőleges rész kijelölhető, a lényeg, hogy a névtől egészen az utólag <strong>beírt időpontokig</strong> tartson és 
+              <strong>a címsorokat ne tartalmazza.</strong>
+            </p>
+            <img src="img/tutorial1.png" class="img-responsive" alt="">
+            <hr>
+
+            <p>A kijelölt részeket egy új excel dokumentumba sorok kihagyása nélkül illeszd be sorban egymás alá.</p>
+            <img src="img/tutorial3.png" class="img-responsive" alt="">
+            <hr>
+
+            <p>Mentsd el tabulátorral tagolt szövegként.</p>
+            <img src="img/tutorial2.png" class="img-responsive" alt="">
+            <hr>
+
+            <p>Töltsd fel ;)</p>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Bezárás</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="container" ng-if="!printView">
       <div class="row">
         <div class="col-md-12">
           <h1 class="main-title">Eurosport Report Parser</h1>
           <h3 class="main-title-small"><small>by morz, <a href="http://github.com/morzzz007/eurosport-report">open-source @ github</a></small></h3>
+        </div>
+      </div>
+      <div class="row" ng-if="!jsonData.length">
+        <div class="col-md-4 col-md-offset-4">
+          <br>
+          <a href="#" class="btn btn-primary btn-block" data-toggle="modal" data-target="#howToModal">Hogyan működik?</a>
+          <br>
         </div>
       </div>
     </div>
