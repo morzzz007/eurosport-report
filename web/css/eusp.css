@@ -31,5 +31,9 @@ table .danger {
     font-family: 'Lato', sans-serif;
     text-align: center;
     padding-top: 10px;
+}
+.main-title-small {
+    font-family: 'Lato', sans-serif;
+    text-align: center;
     padding-bottom: 10px
 }
