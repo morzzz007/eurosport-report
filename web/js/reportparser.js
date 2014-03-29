@@ -18,6 +18,7 @@ eurosportApp.controller('reportController', ['$scope', function($scope) {
     var eus2Name = 'EUROSPORT 2';
     var eus2NEName = 'EUROSPORT 2 NORTH-EAST';
 
+    $scope.supported = angular.isDefined(window.FileReader);
     $scope.selectedFile;
     $scope.textResult;
     $scope.jsonData;

@@ -34,7 +34,15 @@
       </div>
     </div>
 
-    <div class="container" ng-if="!printView">
+    <div class="container" ng-if="!supported">
+      <div class="row">
+        <div class="col-md-12">
+          <h1 class="main-title">Csak modern browserekkel megy, bocsy :((( </h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="container" ng-if="!printView && supported">
       <div class="row">
 
         <div class="col-md-4" ng-class="{'col-md-offset-4': !jsonData.length}">
